@@ -58,18 +58,61 @@ public class Board {
      * Helper function for checkWinner, checks if 3 values are equal
      * @return
      */
-    public boolean equals3() { }
+    public boolean equals3(int a, int b, int c) {
+        return a == b && b == c && a != 0;
+    }
 
     /**
      * Function that checks a board to see if there is any winners.
+     * @return
+     * Int: 0 if no winner yet,
+     * 1 if X wins,
+     * 2 if O wins,
+     * 3 if tie
      */
-//    public boolean checkWinner(int boardNumber) {
-//        gameBoard.get(boardNumber);
-//        boolean winner = false;
-//
-//
-//        int openSpots = 0;
-//
-//    }
+    public int checkWinner(int boardNumber) {
+        int[][] testBoard = gameBoard.get(boardNumber);
+        int winner = 0;
+
+        //Horizontal
+        for(int i = 0; i < 3; i++) {
+            if(equals3(testBoard[i][0], testBoard[i][1], testBoard[i][2])) {
+                winner = testBoard[i][0];
+            }
+        }
+
+        //Vertical
+        for(int i = 0; i < 3; i++) {
+            if(equals3(testBoard[0][i], testBoard[1][i], testBoard[2][i])) {
+                winner = testBoard[0][i];
+            }
+        }
+
+        //Diagonal
+        for(int i = 0; i < 3; i++) {
+            if(equals3(testBoard[0][0], testBoard[1][1], testBoard[2][2])) {
+                winner = testBoard[0][0];
+            }
+            if(equals3(testBoard[0][2], testBoard[1][1], testBoard[2][0])) {
+                winner = testBoard[0][0];
+            }
+        }
+
+        //Checks for a full board with no winners, would result in a tie
+        //I'm not sure if you can tie in Ultimate Tic-Tac-Toe but this is just in case
+        int openSpots = 0;
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                if(testBoard[i][j] ==  0) {
+                    openSpots++;
+                    //If open spots == 0 and no winner, return tie.
+                    if(openSpots == 9 && winner == 0) {
+                        winner = 3;
+                    }
+                }
+            }
+        }
+        return winner;
+    }
 
 }
