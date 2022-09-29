@@ -10,11 +10,11 @@ public class Game {
     }
 
     /**
-     * @param playerToMove The player making a move
+     * @param playerNumber Number of the player playing
      * @param locationToPlay An integer array where the first element is the local board to play in,
      *                       and the second element is the position on the board to play
      */
-    public void makeMove(Player playerToMove, int[] locationToPlay) {
-        Board.boardArray[locationToPlay[0]][locationToPlay[1]] = playerToMove.playerNumber;
+    public void makeMove(int playerNumber, int[] locationToPlay) {
+        Board.boardArray[locationToPlay[0]][locationToPlay[1]] = playerNumber;
     }
 }
