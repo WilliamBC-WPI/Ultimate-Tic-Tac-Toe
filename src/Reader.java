@@ -24,7 +24,6 @@ public class Reader {
                 String data = fileReader.nextLine();
                 String player = getPlayer(data);
                 int location = getLocation(data);
-                gb.writeToBoard(player, location);
                 //TODO function call to: writeToBoard(String player, int location)
                 //Adds a specified players move to the board
             }

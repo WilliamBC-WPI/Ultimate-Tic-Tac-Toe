@@ -1,23 +1,12 @@
-import java.util.Scanner;
 
 public class Player {
 
     int playerNumber;
-    int aiNumber;
+    String playerName;
 
-    public Player(int playerNumber, int aiNumber) {
+    public Player(int playerNumber, String playerName) {
         this.playerNumber = playerNumber;
-        this.aiNumber = aiNumber;
+        this.playerName = playerName;
     }
-
-
-//    public int turn() {
-//        Scanner scan = new Scanner(System.in);
-//        while(!scan.hasNextInt()) {
-//            System.out.println("Error Enter amount as an int.");
-//            scan.nextLine();
-//        }
-//
-//    }
 
 }
