@@ -117,6 +117,18 @@ public class Reader {
         }
     }
 
+    public static String getGoFileName() {
+        return "../Referee/uttt_referee_v7/" + Main.game.player1.playerName+ ".go";
+    }
+
+    public static boolean ourTurn() {
+        File goFile = new File(getGoFileName());
+        if (goFile.exists()){
+            return  true;
+        }
+        return false;
+    }
+
     public static int whosTurn() {
         int whosTurn = 0;
         String playerOne = Main.game.player1.playerName;

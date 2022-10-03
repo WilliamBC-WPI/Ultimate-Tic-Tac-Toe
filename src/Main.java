@@ -1,9 +1,5 @@
 import java.io.File;
 import java.util.ArrayList;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.Time;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.Arrays;
 
@@ -15,23 +11,18 @@ public class Main {
 
     public static void main(String[] args){
         Main.startGame();
-//        Reader.writeToFile("Z 3 4");
-//        Reader.writeToFile("W 5 6");
     }
 
     public static void startGame() {
         game = new Game("Us", "Them");
         System.out.println(game.moveArrayToString(new int[]{1, 2, 5}));
         playFirstFourMoves();
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             Main.turn(game);
         }
     }
 
     public static void turn(Game game) {
-        String playerOne = game.player1.playerName;
-        String playerTwo = game.player2.playerName;
-
         int currentPlayer = Reader.whosTurn();
 
         File movesFile = new File(Main.MOVES_PATH);
@@ -44,8 +35,7 @@ public class Main {
             whoMadeLastMoveName = Reader.getPlayerNameFromMoveString(lastMove);
         }
 
-
-        if(currentPlayer == 1) {
+        if (Reader.ourTurn()) {
             String userMove = Reader.readMove();
             int[] locationToPlay = Reader.parseMove(userMove);
             game.makeMove(game.player1.playerNumber, locationToPlay);
@@ -56,23 +46,19 @@ public class Main {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-        }
-        else if(currentPlayer == -1) {
-            String refreshLastMove = "";
-            while(whoMadeLastMoveName != playerTwo) {
+        } else {
+            while (!Reader.ourTurn()) {
                 try {
                     TimeUnit.SECONDS.sleep(1);
                     //break;
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                ArrayList<String> refreshMoveList = Reader.readFile(MOVES_PATH);
-                refreshLastMove = moveList.get(refreshMoveList.size()-1);
-                whoMadeLastMoveName = Reader.getPlayerNameFromMoveString(refreshLastMove);
-
             }
 
-            int[] locationToPlay = Reader.parseMove(refreshLastMove);//Minimax call, minimizing
+            String lastMove = Reader.readFile(MOVES_PATH).get(0);
+            int[] locationToPlay = {Reader.parseMove(lastMove)[1], Reader.parseMove(lastMove)[2]};
+            System.out.println("the location is " + Arrays.toString(locationToPlay));
             game.makeMove(game.player2.playerNumber, locationToPlay);
         }
     }
