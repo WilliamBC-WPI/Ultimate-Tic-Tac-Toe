@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,23 +10,13 @@ import java.util.Arrays;
 public class Main {
     public static Game game;
 
-    //public static final String REFEREEPATH = "../Referee/uttt_referee_v4/first_four_moves";
-
-
-    //public static final String FIRST_FOUR_MOVES = "../Referee/uttt_referee_v4/first_four_moves";
-    //public static final String MOVES_PATH = "../Referee/uttt_referee_v4/move_file";
-    //public static final String FILEPATH = "../Referee/uttt_referee_v4";
-
-    public static final String FIRST_FOUR_MOVES = "/Users/will/Documents/GitHub/Ultimate Tic-Tac-Toe/Referee/uttt_referee_v4/first_four_moves";
-    public static final String MOVES_PATH =  "/Users/will/Documents/GitHub/Ultimate Tic-Tac-Toe/Referee/uttt_referee_v4/move_file";
-    public static final String FILEPATH = "/Users/will/Documents/GitHub/Ultimate Tic-Tac-Toe/Referee/uttt_referee_v4";
-
+    public static final String FIRST_FOUR_MOVES = "../Referee/uttt_referee_v7/first_four_moves";
+    public static final String MOVES_PATH = "../Referee/uttt_referee_v7/move_file";
+    public static final String FILEPATH = "../Referee/uttt_referee_v7";
 
 
     public static void main(String[] args){
         Main.startGame();
-//        Reader.writeToFile("Z 3 4");
-//        Reader.writeToFile("W 5 6");
     }
 
     public static void startGame() {
@@ -40,39 +31,47 @@ public class Main {
     public static void turn(Game game) {
         String playerOne = game.player1.playerName;
         String playerTwo = game.player2.playerName;
-        //If your turn, write to board
-        //If opponents turn, wait till last line of move_list is from opponent and read from board
+
         int currentPlayer = Reader.whosTurn();
 
-            //if theres a move in the move file, were going second
-            //if not youre going first
-        //TODO check if files empty, see who goes first.
-//        if() {
-//
-//        }
-        ArrayList<String> moveList = Reader.readFile(FIRST_FOUR_MOVES);
-        String lastMove = moveList.get(moveList.size()-1);
-        String whoMadeLastMoveName = Reader.getPlayerNameFromMoveString(lastMove);
+        File movesFile = new File(Main.MOVES_PATH);
+        String whoMadeLastMoveName = "";
+        ArrayList<String> moveList = new ArrayList<>();
 
-        //System.out.println("CurrentPlayer: " + currentPlayer);
+        if(Reader.doesFileContain(movesFile)) {
+            moveList = Reader.readFile(FIRST_FOUR_MOVES);
+            String lastMove = moveList.get(moveList.size()-1);
+            whoMadeLastMoveName = Reader.getPlayerNameFromMoveString(lastMove);
+        }
+
         if(currentPlayer == 1) {
             String userMove = Reader.readMove();
             int[] locationToPlay = Reader.parseMove(userMove);
             game.makeMove(game.player1.playerNumber, locationToPlay);
             Reader.writeToFile(userMove);
+            try {
+                TimeUnit.MILLISECONDS.sleep(200);
+                //break;
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         else if(currentPlayer == -1) {
-            ArrayList<String> allMoves = Reader.readFile(MOVES_PATH);
-            //Maybe need to constantly be re initialize moveList
+            String refreshLastMove = "";
             while(whoMadeLastMoveName != playerTwo) {
                 try {
-                    TimeUnit.SECONDS.sleep(10);
-                    break;
+                    TimeUnit.SECONDS.sleep(1);
+                    //break;
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+                ArrayList<String> refreshMoveList = Reader.readFile(MOVES_PATH);
+                refreshLastMove = moveList.get(refreshMoveList.size()-1);
+                whoMadeLastMoveName = Reader.getPlayerNameFromMoveString(refreshLastMove);
+
             }
-            int[] locationToPlay = new int[2];//Minimax call, minimizing
+
+            int[] locationToPlay = Reader.parseMove(refreshLastMove);//Minimax call, minimizing
             game.makeMove(game.player2.playerNumber, locationToPlay);
         }
     }

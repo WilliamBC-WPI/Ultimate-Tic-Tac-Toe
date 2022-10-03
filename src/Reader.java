@@ -9,7 +9,6 @@ public class Reader {
     //To figure out who goes first, a function must be able to find the .go file in the directory. Player 1 will get that name and
     //player 2 will get their name, the remaining name from the first_four_moves file
 
-    //TODO Can comnvert to returning a string becuse the move file is only ever one line
     public static ArrayList<String> readFile(String pathname){
         File firstFourMovesFile = new File(pathname);
         ArrayList<String> output = new ArrayList<>();
@@ -37,32 +36,47 @@ public class Reader {
 
     public static String getOtherPlayerName() {
         File movesFile = new File(Main.MOVES_PATH);
-        if (movesFile.exists()) {
+        if(doesFileContain(movesFile)) {
             try {
                 Scanner fileReader = new Scanner(movesFile);
-                if(fileReader.hasNext()) {
-                    return getPlayerNameFromMoveString(fileReader.nextLine());
-                } else {
-                    return getPlayerName(1);
+                return getPlayerNameFromMoveString(fileReader.nextLine());
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return getPlayerName(1);
+        }
+
+//        if (movesFile.exists()) {
+//            try {
+//                Scanner fileReader = new Scanner(movesFile);
+//                if(fileReader.hasNext()) {
+//                    return getPlayerNameFromMoveString(fileReader.nextLine());
+//                } else {
+//                    return getPlayerName(1);
+//                }
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//                System.out.println("File not found my guy");
+//            }
+//        }
+        //return "AI";
+    }
+
+    public static Boolean doesFileContain(File file) {
+        if(file.exists()) {
+            try {
+                Scanner fileReader = new Scanner(file);
+                if (fileReader.hasNext()) {
+                    return true;
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                System.out.println("File not found my guy");
+                System.out.println("File Not found");
             }
         }
-        return "AI";
-    }
-
-    public static Boolean isFileEmpty(String filePath) {
-        File myFile = new File(filePath);
-        try {
-            Scanner fileReader = new Scanner(myFile);
-            if(fileReader.hasNext()) {
-                return true;
-            }
-        } catch(FileNotFoundException e){
-            e.printStackTrace();
-            System.out.println("File Not found");
+        else {
+            System.out.println("File doesnt exist!!");
         }
         return false;
     }
@@ -141,47 +155,6 @@ public class Reader {
         Scanner userScanner = new Scanner(System.in);
         System.out.println("Enter User Move in 'Name # #' format: ");
         return userScanner.nextLine();
-    }
-
-    /**
-     * getPlayer(String S)
-     * @Param: S is a string representing a turn ex: "Zane 5 4"
-     * @Return: String representing a player ex: "Zane"
-     */
-    public static String getPlayer(String s) {
-        String playerID = "";
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == ' ') {
-                playerID = s.substring(0, i);
-            }
-        }
-        return playerID;
-    }
-
-
-    /**
-     * getLocation(String S)
-     * @Param: S is a string representing a turn ex: "Zane 5 4"
-     * @Return: Integer x location on board where 0<x<80
-     */
-    public int getLocation(String s) {
-        int mbLoc = -1;
-        int boardLoc = -1;
-        int returnLocation;
-
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == ' ') {
-                mbLoc = Integer.parseInt(s.substring(i + 1, i + 2));
-                boardLoc = Integer.parseInt(s.substring(s.length() - 1));
-            }
-        }
-        if(mbLoc > -1) {
-            returnLocation = mbLoc * 9 + boardLoc;
-            return returnLocation;
-        }
-        else {
-            return -1;
-        }
     }
 
 }
