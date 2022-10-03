@@ -8,19 +8,10 @@ import java.util.Arrays;
 
 public class Main {
     public static Game game;
-
-    //public static final String REFEREEPATH = "../Referee/uttt_referee_v4/first_four_moves";
-
-
-    //public static final String FIRST_FOUR_MOVES = "../Referee/uttt_referee_v4/first_four_moves";
-    //public static final String MOVES_PATH = "../Referee/uttt_referee_v4/move_file";
-    //public static final String FILEPATH = "../Referee/uttt_referee_v4";
-
-    public static final String FIRST_FOUR_MOVES = "/Users/will/Documents/GitHub/Ultimate Tic-Tac-Toe/Referee/uttt_referee_v4/first_four_moves";
-    public static final String MOVES_PATH =  "/Users/will/Documents/GitHub/Ultimate Tic-Tac-Toe/Referee/uttt_referee_v4/move_file";
-    public static final String FILEPATH = "/Users/will/Documents/GitHub/Ultimate Tic-Tac-Toe/Referee/uttt_referee_v4";
-
-
+    
+    public static final String FIRST_FOUR_MOVES = "../Referee/uttt_referee_v7/first_four_moves";
+    public static final String MOVES_PATH = "../Referee/uttt_referee_v7/move_file";
+    public static final String FILEPATH = "../Referee/uttt_referee_v7";
 
     public static void main(String[] args){
         Main.startGame();
@@ -44,17 +35,10 @@ public class Main {
         //If opponents turn, wait till last line of move_list is from opponent and read from board
         int currentPlayer = Reader.whosTurn();
 
-            //if theres a move in the move file, were going second
-            //if not youre going first
-        //TODO check if files empty, see who goes first.
-//        if() {
-//
-//        }
         ArrayList<String> moveList = Reader.readFile(FIRST_FOUR_MOVES);
         String lastMove = moveList.get(moveList.size()-1);
         String whoMadeLastMoveName = Reader.getPlayerNameFromMoveString(lastMove);
 
-        //System.out.println("CurrentPlayer: " + currentPlayer);
         if(currentPlayer == 1) {
             String userMove = Reader.readMove();
             int[] locationToPlay = Reader.parseMove(userMove);
