@@ -17,4 +17,15 @@ public class Game {
     public void makeMove(int playerNumber, int[] locationToPlay) {
         Board.boardArray[locationToPlay[0]][locationToPlay[1]] = playerNumber;
     }
+
+    public String moveArrayToString(int[] moveArray) {
+        String playerName;
+        if (moveArray[0] == 1) {
+            playerName = player1.playerName;
+        } else {
+            playerName = player2.playerName;
+        }
+
+        return playerName + " " + moveArray[1] + " " + moveArray[2];
+    }
 }
