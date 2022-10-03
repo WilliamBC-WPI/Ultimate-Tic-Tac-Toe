@@ -1,5 +1,9 @@
+<<<<<<< Updated upstream
 import java.io.File;
 import java.io.FileNotFoundException;
+=======
+import java.io.*;
+>>>>>>> Stashed changes
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -8,9 +12,7 @@ public class Reader {
     //To figure out who goes first, a function must be able to find the .go file in the directory. Player 1 will get that name and
     //player 2 will get their name, the remaining name from the first_four_moves file
 
-//    String initialMovesFile = "first_four_moves";
-//    String filename = "move_file";
-
+    //TODO Can comnvert to returning a string becuse the move file is only ever one line
     public static ArrayList<String> readFile(String pathname){
         File firstFourMovesFile = new File(pathname);
         ArrayList<String> output = new ArrayList<>();
@@ -77,6 +79,103 @@ public class Reader {
         }
     }
 
+<<<<<<< Updated upstream
     public static void writeToMoveFile(String move) {
     }
+=======
+    public static void writeToFile(String s) {
+        try {
+            File moveFile = new File(Main.MOVEPATH);
+            FileWriter writer = new FileWriter(moveFile, false);
+            if(s.length() > 0) {
+                writer.write(s);
+                writer.close();
+            }
+            else {
+                System.out.println("Empty String");
+            }
+        }
+        catch (IOException e) {
+            System.out.println("File to write to does not exist my guy!");
+        }
+    }
+
+    public static int whosTurn() {
+        int whosTurn = 0;
+        String playerOne = Main.game.player1.playerName;
+        String playerTwo = Main.game.player2.playerName;
+        try {
+            File directory = new File(Main.FILEPATH);
+            String[] flist = directory.list();
+            int flag = 0;
+            if (flist == null) {
+                System.out.println("Empty directory");
+                System.exit(0);
+            } else {
+                for (int i = 0; i < flist.length; i++) {
+                    String currentFileName = flist[i];
+                    if (currentFileName.equals(playerOne + ".go")) {
+                        whosTurn = Main.game.player1.playerNumber;
+
+                    } else if (currentFileName.equals(playerTwo + ".go")) {
+                        whosTurn = Main.game.player2.playerNumber;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return whosTurn;
+    }
+
+    public static String readMove() {
+        Scanner userScanner = new Scanner(System.in);
+        System.out.println("Enter User Move in 'Name # #' format: ");
+        return userScanner.nextLine();
+    }
+
+    /**
+     * getPlayer(String S)
+     * @Param: S is a string representing a turn ex: "Zane 5 4"
+     * @Return: String representing a player ex: "Zane"
+     */
+    public static String getPlayer(String s) {
+        String playerID = "";
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == ' ') {
+                playerID = s.substring(0, i);
+            }
+        }
+        return playerID;
+    }
+
+
+    /**
+     * getLocation(String S)
+     * @Param: S is a string representing a turn ex: "Zane 5 4"
+     * @Return: Integer x location on board where 0<x<80
+     */
+    public int getLocation(String s) {
+        int mbLoc = -1;
+        int boardLoc = -1;
+        int returnLocation;
+
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == ' ') {
+                mbLoc = Integer.parseInt(s.substring(i + 1, i + 2));
+                boardLoc = Integer.parseInt(s.substring(s.length() - 1));
+            }
+        }
+        if(mbLoc > -1) {
+            returnLocation = mbLoc * 9 + boardLoc;
+            return returnLocation;
+        }
+        else {
+            return -1;
+        }
+    }
+
+
+
+>>>>>>> Stashed changes
 }
