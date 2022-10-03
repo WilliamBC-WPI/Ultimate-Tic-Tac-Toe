@@ -8,6 +8,7 @@ public class Main {
     public static final String FIRST_FOUR_MOVES = "../Referee/uttt_referee_v7/first_four_moves";
     public static final String MOVES_PATH = "../Referee/uttt_referee_v7/move_file";
     public static final String FILEPATH = "../Referee/uttt_referee_v7";
+    public static final String END_GAME_PATH = "../Referee/uttt_referee_v7/end_game";
 
     public static void main(String[] args){
         Main.startGame();
@@ -17,9 +18,10 @@ public class Main {
         game = new Game("Us", "Them");
         System.out.println(game.moveArrayToString(new int[]{1, 2, 5}));
         playFirstFourMoves();
-        for (int i = 0; i < 10; i++) {
-            Main.turn(game);
+        while (!Reader.gameOver()) {
+            turn(game);
         }
+        System.out.println("GAME ENDED");
     }
 
     public static void turn(Game game) {
@@ -37,7 +39,7 @@ public class Main {
 
         if (Reader.ourTurn()) {
             String userMove = Reader.readMove();
-            int[] locationToPlay = Reader.parseMove(userMove);
+            int[] locationToPlay = {Reader.parseMove(userMove)[1], Reader.parseMove(userMove)[2]};
             game.makeMove(game.player1.playerNumber, locationToPlay);
             Reader.writeToFile(userMove);
             try {

@@ -45,21 +45,6 @@ public class Reader {
         } else {
             return getPlayerName(1);
         }
-
-//        if (movesFile.exists()) {
-//            try {
-//                Scanner fileReader = new Scanner(movesFile);
-//                if(fileReader.hasNext()) {
-//                    return getPlayerNameFromMoveString(fileReader.nextLine());
-//                } else {
-//                    return getPlayerName(1);
-//                }
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//                System.out.println("File not found my guy");
-//            }
-//        }
-        //return "AI";
     }
 
     public static Boolean doesFileContain(File file) {
@@ -125,6 +110,14 @@ public class Reader {
         File goFile = new File(getGoFileName());
         if (goFile.exists()){
             return  true;
+        }
+        return false;
+    }
+
+    public static boolean gameOver() {
+        File endFile = new File(Main.END_GAME_PATH);
+        if (endFile.exists()) {
+            return true;
         }
         return false;
     }
