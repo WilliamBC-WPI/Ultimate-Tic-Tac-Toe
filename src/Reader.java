@@ -1,9 +1,6 @@
-<<<<<<< Updated upstream
 import java.io.File;
 import java.io.FileNotFoundException;
-=======
 import java.io.*;
->>>>>>> Stashed changes
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -53,8 +50,21 @@ public class Reader {
                 System.out.println("File not found my guy");
             }
         }
-
         return "AI";
+    }
+
+    public static Boolean isFileEmpty(String filePath) {
+        File myFile = new File(filePath);
+        try {
+            Scanner fileReader = new Scanner(myFile);
+            if(fileReader.hasNext()) {
+                return true;
+            }
+        } catch(FileNotFoundException e){
+            e.printStackTrace();
+            System.out.println("File Not found");
+        }
+        return false;
     }
 
     public static String getPlayerNameFromMoveString(String moveString) {
@@ -79,13 +89,12 @@ public class Reader {
         }
     }
 
-<<<<<<< Updated upstream
     public static void writeToMoveFile(String move) {
     }
-=======
+
     public static void writeToFile(String s) {
         try {
-            File moveFile = new File(Main.MOVEPATH);
+            File moveFile = new File(Main.MOVES_PATH);
             FileWriter writer = new FileWriter(moveFile, false);
             if(s.length() > 0) {
                 writer.write(s);
@@ -175,7 +184,4 @@ public class Reader {
         }
     }
 
-
-
->>>>>>> Stashed changes
 }

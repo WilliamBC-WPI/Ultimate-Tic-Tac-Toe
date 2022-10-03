@@ -1,26 +1,26 @@
-<<<<<<< Updated upstream
 import java.util.ArrayList;
-=======
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.Arrays;
->>>>>>> Stashed changes
 
 public class Main {
     public static Game game;
 
-<<<<<<< Updated upstream
-    public static final String FIRST_FOUR_MOVES = "../Referee/uttt_referee_v4/first_four_moves";
-    public static final String MOVES_PATH = "../Referee/uttt_referee_v4/move_file";
-=======
     //public static final String REFEREEPATH = "../Referee/uttt_referee_v4/first_four_moves";
-    public static final String REFEREEPATH = "/Users/will/Documents/GitHub/Ultimate Tic-Tac-Toe/Referee/uttt_referee_v4/first_four_moves";
-    public static final String MOVEPATH =  "/Users/will/Documents/GitHub/Ultimate Tic-Tac-Toe/Referee/uttt_referee_v4/move_file";
+
+
+    //public static final String FIRST_FOUR_MOVES = "../Referee/uttt_referee_v4/first_four_moves";
+    //public static final String MOVES_PATH = "../Referee/uttt_referee_v4/move_file";
+    //public static final String FILEPATH = "../Referee/uttt_referee_v4";
+
+    public static final String FIRST_FOUR_MOVES = "/Users/will/Documents/GitHub/Ultimate Tic-Tac-Toe/Referee/uttt_referee_v4/first_four_moves";
+    public static final String MOVES_PATH =  "/Users/will/Documents/GitHub/Ultimate Tic-Tac-Toe/Referee/uttt_referee_v4/move_file";
     public static final String FILEPATH = "/Users/will/Documents/GitHub/Ultimate Tic-Tac-Toe/Referee/uttt_referee_v4";
->>>>>>> Stashed changes
+
+
 
     public static void main(String[] args){
         Main.startGame();
@@ -46,8 +46,11 @@ public class Main {
 
             //if theres a move in the move file, were going second
             //if not youre going first
-        if()
-        ArrayList<String> moveList = Reader.readFile(REFEREEPATH);
+        //TODO check if files empty, see who goes first.
+//        if() {
+//
+//        }
+        ArrayList<String> moveList = Reader.readFile(FIRST_FOUR_MOVES);
         String lastMove = moveList.get(moveList.size()-1);
         String whoMadeLastMoveName = Reader.getPlayerNameFromMoveString(lastMove);
 
@@ -59,7 +62,7 @@ public class Main {
             Reader.writeToFile(userMove);
         }
         else if(currentPlayer == -1) {
-            ArrayList<String> allMoves = Reader.readFile(REFEREEPATH);
+            ArrayList<String> allMoves = Reader.readFile(MOVES_PATH);
             //Maybe need to constantly be re initialize moveList
             while(whoMadeLastMoveName != playerTwo) {
                 try {
