@@ -8,7 +8,6 @@ public class Reader {
 
     //To figure out who goes first, a function must be able to find the .go file in the directory. Player 1 will get that name and
     //player 2 will get their name, the remaining name from the first_four_moves file
-
     public static ArrayList<String> readFile(String pathname){
         File firstFourMovesFile = new File(pathname);
         ArrayList<String> output = new ArrayList<>();
@@ -103,22 +102,17 @@ public class Reader {
         }
     }
 
-    public static void writeToMoveFile(String move) {
-    }
-
     public static void writeToFile(String s) {
         try {
             File moveFile = new File(Main.MOVES_PATH);
             FileWriter writer = new FileWriter(moveFile, false);
-            if(s.length() > 0) {
+            if (s.length() > 0) {
                 writer.write(s);
                 writer.close();
-            }
-            else {
+            } else {
                 System.out.println("Empty String");
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("File to write to does not exist my guy!");
         }
     }

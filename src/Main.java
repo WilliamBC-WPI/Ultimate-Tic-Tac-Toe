@@ -14,9 +14,10 @@ public class Main {
     public static final String MOVES_PATH = "../Referee/uttt_referee_v7/move_file";
     public static final String FILEPATH = "../Referee/uttt_referee_v7";
 
-
     public static void main(String[] args){
         Main.startGame();
+//        Reader.writeToFile("Z 3 4");
+//        Reader.writeToFile("W 5 6");
     }
 
     public static void startGame() {
@@ -43,6 +44,7 @@ public class Main {
             String lastMove = moveList.get(moveList.size()-1);
             whoMadeLastMoveName = Reader.getPlayerNameFromMoveString(lastMove);
         }
+
 
         if(currentPlayer == 1) {
             String userMove = Reader.readMove();
