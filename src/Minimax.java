@@ -60,10 +60,56 @@ public class Minimax {
         return 0;
     }
 
+    public static int evaluatePos(int[] position, int sq) {
+        position[sq] = bot;
+        int eval = 0;
+        // heuristic values
+        double[] points = new double[] { 0.2, 0.17, 0.2, 0.17, 0.22, 0.17, 0.2, 0.17, 0.2 };
+
+        int a = 2;
+        if (position[0] + position[1] + position[2] == a || position[3] + position[4] + position[5] == a
+                || position[6] + position[7] + position[8] == a || position[0] + position[3] + position[6] == a
+                || position[1] + position[4] + position[7] == a ||
+                position[2] + position[5] + position[8] == a || position[0] + position[4] + position[8] == a
+                || position[2] + position[4] + position[6] == a) {
+            eval += 1; // 😭
+        }
+
+        // take victories
+        a = -3;
+        if (position[0] + position[1] + position[2] == a || position[3] + position[4] + position[5] == a
+                || position[6] + position[7] + position[8] == a || position[0] + position[3] + position[6] == a
+                || position[1] + position[4] + position[7] == a ||
+                position[2] + position[5] + position[8] == a || position[0] + position[4] + position[8] == a
+                || position[2] + position[4] + position[6] == a) {
+            eval += 5;
+        }
+
+        // block a player's turn
+        position[sq] = player;
+
+        a = 3;
+        if (position[0] + position[1] + position[2] == a || position[3] + position[4] + position[5] == a
+                || position[6] + position[7] + position[8] == a || position[0] + position[3] + position[6] == a
+                || position[1] + position[4] + position[7] == a ||
+                position[2] + position[5] + position[8] == a || position[0] + position[4] + position[8] == a
+                || position[2] + position[4] + position[6] == a) {
+            eval += 2;
+        }
+
+        position[sq] = bot;
+
+        eval -= checkWinCondition(position) * 15;
+
+        position[sq] = 0;
+
+        return eval;
+    }
+
     /**
      * evaluate a board fairly - realEvaluateSquare HEURISTIC
      * 
-     * @param position position on basic tictactoe board
+     * @param position on basic tictactoe board
      */
     public int evaluateSquare(int[] position) {
         int eval = 0;
