@@ -16,9 +16,13 @@ public class Main {
 
     public static void startGame() {
         game = new Game("Us", "Them");
-        System.out.println(game.moveArrayToString(new int[]{1, 2, 5}));
+        Board.mainBoard[4] = 1;
+        Board.mainBoard[5] = 1;
+        System.out.println(Minimax.evaluateBoard(Board.mainBoard));
+        Board.printBoardArray();
+
         playFirstFourMoves();
-        while (!Reader.gameOver()) {
+       while (!Reader.gameOver()) {
             turn(game);
         }
         System.out.println("GAME ENDED");

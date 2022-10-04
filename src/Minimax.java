@@ -1,249 +1,213 @@
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.stream.IntStream;
 
 public class Minimax {
 
-    static HashMap<String, Integer> evals = new HashMap<String, Integer>();
+    static HashMap<String, Double> evals = new HashMap<String, Double>();
 
     static int RUNS = 0;
     static int MOVES = 0;
 
-    static int bot = -1;
-    static int player = 1;
+    static int player2Number = -1;
+    static int player1Number = 1;
 
     static int currentTurn = 1;
     //static int bestMove = -1;
     public static int currentBoard = 4;
     Integer[] bestScore = new Integer[]{Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
 
+    public static boolean tallyBoard(int[] board, int tallyTotal) {
+        if (board[0] + board[1] + board[2] == tallyTotal
+                || board[3] + board[4] + board[5] == tallyTotal
+                || board[6] + board[7] + board[8] == tallyTotal
+                || board[0] + board[3] + board[6] == tallyTotal
+                || board[1] + board[4] + board[7] == tallyTotal
+                || board[2] + board[5] + board[8] == tallyTotal
+                || board[0] + board[4] + board[8] == tallyTotal
+                || board[2] + board[4] + board[6] == tallyTotal) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean tallyBoardByType(int[] board, int tallyTotal, VictoryType victoryType) {
+        switch (victoryType) {
+            case HORIZONTAL -> {
+                if (board[0] + board[1] + board[2] == tallyTotal
+                        || board[3] + board[4] + board[5] == tallyTotal
+                        || board[6] + board[7] + board[8] == tallyTotal) {
+                    return true;
+                }
+            }
+            case VERTICAL -> {
+                if (board[0] + board[3] + board[6] == tallyTotal
+                        || board[1] + board[4] + board[7] == tallyTotal
+                        || board[6] + board[7] + board[8] == tallyTotal) {
+                    return true;
+                }
+            }
+            case DIAGONAL -> {
+                if (board[0] + board[4] + board[8] == tallyTotal
+                        || board[2] + board[4] + board[6] == tallyTotal) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean someOtherTally(int[] board, int tallyTotalBase) {
+        if((board[0] + board[1] == 2*tallyTotalBase && board[2] == -tallyTotalBase)
+                || (board[1] + board[2] == 2*tallyTotalBase && board[0] == -tallyTotalBase)
+                || (board[0] + board[2] == 2*tallyTotalBase && board[1] == -tallyTotalBase)
+                || (board[3] + board[4] == 2*tallyTotalBase && board[5] == -tallyTotalBase)
+                || (board[3] + board[5] == 2*tallyTotalBase && board[4] == -tallyTotalBase)
+                || (board[5] + board[4] == 2*tallyTotalBase && board[3] == -tallyTotalBase)
+                || (board[6] + board[7] == 2*tallyTotalBase && board[8] == -tallyTotalBase)
+                || (board[6] + board[8] == 2*tallyTotalBase && board[7] == -tallyTotalBase)
+                || (board[7] + board[8] == 2*tallyTotalBase && board[6] == -tallyTotalBase)
+                || (board[0] + board[3] == 2*tallyTotalBase && board[6] == -tallyTotalBase)
+                || (board[0] + board[6] == 2*tallyTotalBase && board[3] == -tallyTotalBase)
+                || (board[3] + board[6] == 2*tallyTotalBase && board[0] == -tallyTotalBase)
+                || (board[1] + board[4] == 2*tallyTotalBase && board[7] == -tallyTotalBase)
+                || (board[1] + board[7] == 2*tallyTotalBase && board[4] == -tallyTotalBase)
+                || (board[4] + board[7] == 2*tallyTotalBase && board[1] == -tallyTotalBase)
+                || (board[2] + board[5] == 2*tallyTotalBase && board[8] == -tallyTotalBase)
+                || (board[2] + board[8] == 2*tallyTotalBase && board[5] == -tallyTotalBase)
+                || (board[5] + board[8] == 2*tallyTotalBase && board[2] == -tallyTotalBase)
+                || (board[0] + board[4] == 2*tallyTotalBase && board[8] == -tallyTotalBase)
+                || (board[0] + board[8] == 2*tallyTotalBase && board[4] == -tallyTotalBase)
+                || (board[4] + board[8] == 2*tallyTotalBase && board[0] == -tallyTotalBase)
+                || (board[2] + board[4] == 2*tallyTotalBase && board[6] == -tallyTotalBase)
+                || (board[2] + board[6] == 2*tallyTotalBase && board[4] == -tallyTotalBase)
+                || (board[4] + board[6] == 2*tallyTotalBase && board[2] == -tallyTotalBase)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
-     * helper that checks if a normal tic tac toe game has been won
+     * Checks if a normal tic tac toe game has been won
      * checks columns, rows & diagonals for victory
      * 
-     * @param position
+     * @param board
      * @return 1 or -1 if a specific player has won, returns 0 if no one has won
      */
-    public static int checkWinCondition(int[] position) {
-        int a = 1;
-        // SINGLE ARRAY
-        if (position[0] + position[1] + position[2] == a * 3 || position[3] + position[4] + position[5] == a * 3
-                || position[6] + position[7] + position[8] == a * 3 || position[0] + position[3] + position[6] == a * 3
-                || position[1] + position[4] + position[7] == a * 3 ||
-                position[2] + position[5] + position[8] == a * 3 || position[0] + position[4] + position[8] == a * 3
-                || position[2] + position[4] + position[6] == a * 3) {
-            return a;
+    public static int checkWinCondition(int[] board) {
+        if (tallyBoard(board, 3)) {
+            return 1;
+        } else if (tallyBoard(board, -3)) {
+            return -1;
         }
-        // DOUBLE ARRAY
-        // if (boardArray[0][0] + boardArray[0][1] + boardArray[0][2] == a * 3
-        // || boardArray[1][0] + boardArray[1][1] + boardArray[1][2] == a * 3
-        // || boardArray[2][0] + boardArray[2][1] + boardArray[2][2] == a * 3
-        // || boardArray[0][0] + boardArray[1][0] + boardArray[2][0] == a * 3
-        // || boardArray[0][1] + boardArray[1][1] + boardArray[2][1] == a * 3
-        // || boardArray[0][2] + boardArray[1][2] + boardArray[2][2] == a * 3
-        // || boardArray[0][0] + boardArray[1][1] + boardArray[2][2] == a * 3
-        // || boardArray[0][2] + boardArray[1][1] + boardArray[2][0] == a * 3) {
-        // return a;
-        // }
-        a = -1;
-        // SINGLE ARRAY
-        if (position[0] + position[1] + position[2] == a * 3 || position[3] + position[4] + position[5] == a * 3
-                || position[6] + position[7] + position[8] == a * 3 || position[0] + position[3] + position[6] == a * 3
-                || position[1] + position[4] + position[7] == a * 3 ||
-                position[2] + position[5] + position[8] == a * 3 || position[0] + position[4] + position[8] == a * 3
-                || position[2] + position[4] + position[6] == a * 3) {
-            return a;
-        }
-        // DOUBLE ARRAY
-        // if (boardArray[0][0] + boardArray[0][1] + boardArray[0][2] == a * 3
-        // || boardArray[1][0] + boardArray[1][1] + boardArray[1][2] == a * 3
-        // || boardArray[2][0] + boardArray[2][1] + boardArray[2][2] == a * 3
-        // || boardArray[0][0] + boardArray[1][0] + boardArray[2][0] == a * 3
-        // || boardArray[0][1] + boardArray[1][1] + boardArray[2][1] == a * 3
-        // || boardArray[0][2] + boardArray[1][2] + boardArray[2][2] == a * 3
-        // || boardArray[0][0] + boardArray[1][1] + boardArray[2][2] == a * 3
-        // || boardArray[0][2] + boardArray[1][1] + boardArray[2][0] == a * 3) {
-        // return a;
-        // }
+
         return 0;
     }
 
-    public static int evaluatePos(int[] position, int sq) {
-        position[sq] = bot;
-        int eval = 0;
+    /** Evaluates a position on a board and assigns that specific position a value
+     *
+     * @param board
+     * @param position
+     * @return
+     */
+    public static double evaluatePos(int[] board, int position) {
+        board[position] = 1;
+        double eval = 0;
+
         // heuristic values
         double[] points = new double[] { 0.2, 0.17, 0.2, 0.17, 0.22, 0.17, 0.2, 0.17, 0.2 };
+        eval += points[position];
 
-        int a = 2;
-        if (position[0] + position[1] + position[2] == a || position[3] + position[4] + position[5] == a
-                || position[6] + position[7] + position[8] == a || position[0] + position[3] + position[6] == a
-                || position[1] + position[4] + position[7] == a ||
-                position[2] + position[5] + position[8] == a || position[0] + position[4] + position[8] == a
-                || position[2] + position[4] + position[6] == a) {
-            eval += 1; // 😭
+        if (tallyBoard(board, 2)) {
+            eval += 1;
         }
-
-        // take victories
-        a = -3;
-        if (position[0] + position[1] + position[2] == a || position[3] + position[4] + position[5] == a
-                || position[6] + position[7] + position[8] == a || position[0] + position[3] + position[6] == a
-                || position[1] + position[4] + position[7] == a ||
-                position[2] + position[5] + position[8] == a || position[0] + position[4] + position[8] == a
-                || position[2] + position[4] + position[6] == a) {
+        if (tallyBoard(board, 3)) {
             eval += 5;
         }
 
-        // block a player's turn
-        position[sq] = player;
-
-        a = 3;
-        if (position[0] + position[1] + position[2] == a || position[3] + position[4] + position[5] == a
-                || position[6] + position[7] + position[8] == a || position[0] + position[3] + position[6] == a
-                || position[1] + position[4] + position[7] == a ||
-                position[2] + position[5] + position[8] == a || position[0] + position[4] + position[8] == a
-                || position[2] + position[4] + position[6] == a) {
-            eval += 2;
+        board[position] = -1;
+        if (tallyBoard(board, -3)) {
+            eval+=2;
         }
-
-        position[sq] = bot;
-
-        eval -= checkWinCondition(position) * 15;
-
-        position[sq] = 0;
+        board[position] = 1;
+        eval += checkWinCondition(board) * 15;
+        board[position] = 0;
 
         return eval;
     }
 
     /**
-     * evaluate a board fairly - realEvaluateSquare HEURISTIC
+     * Evaluates a board fairly - realEvaluateSquare HEURISTIC
      * 
-     * @param position on basic tictactoe board
+     * @param board on basic Tic-Tac-Toe board
      */
-    public static int evaluateSquare(int[] position) {
-        int eval = 0;
+    public static double evaluateBoard(int[] board) {
+        double eval = 0;
         double[] points = { 0.2, 0.17, 0.2, 0.17, 0.22, 0.17, 0.2, 0.17, 0.2 }; // heuristic
 
-        // multiplies heuristic pts by position on board ?
+        // tallies up the heuristic points for a board ?
         for (int i = 0; i < 9; i++) {
-            eval -= position[i] * points[i];
+            eval -= board[i] * points[i];
         }
-        // assigns 6 to horizontal victory, 6 to vertical victory, 7 to diagonal victory
-        int a = 2;
-        // horizontal
-        if (position[0] + position[1] + position[2] == a || position[3] + position[4] + position[5] == a
-                || position[6] + position[7] + position[8] == a) {
+
+        // Decrease points for rival pairs
+        if (tallyBoardByType(board, -2, VictoryType.HORIZONTAL)) {
             eval -= 6;
         }
-        // vertical
-        if (position[0] + position[3] + position[6] == a || position[1] + position[4] + position[7] == a
-                || position[6] + position[7] + position[8] == a) {
+        if (tallyBoardByType(board, -2, VictoryType.VERTICAL)) {
             eval -= 6;
         }
-        // diagonal
-        if (position[0] + position[4] + position[8] == a || position[2] + position[4] + position[6] == a) {
+        if (tallyBoardByType(board, -2, VictoryType.DIAGONAL)) {
             eval -= 7;
         }
 
-        a = -1;
-        // evaluation heuristic - did we win the entire row/column/diagonal
-        if ((position[0] + position[1] == 2 * a && position[2] == -a)
-                || (position[1] + position[2] == 2 * a && position[0] == -a)
-                || (position[0] + position[2] == 2 * a && position[1] == -a)
-                || (position[3] + position[4] == 2 * a && position[5] == -a)
-                || (position[3] + position[5] == 2 * a && position[4] == -a)
-                || (position[5] + position[4] == 2 * a && position[3] == -a)
-                || (position[6] + position[7] == 2 * a && position[8] == -a)
-                || (position[6] + position[8] == 2 * a && position[7] == -a)
-                || (position[7] + position[8] == 2 * a && position[6] == -a)
-                || (position[0] + position[3] == 2 * a && position[6] == -a)
-                || (position[0] + position[6] == 2 * a && position[3] == -a)
-                || (position[3] + position[6] == 2 * a && position[0] == -a)
-                || (position[1] + position[4] == 2 * a && position[7] == -a)
-                || (position[1] + position[7] == 2 * a && position[4] == -a)
-                || (position[4] + position[7] == 2 * a && position[1] == -a)
-                || (position[2] + position[5] == 2 * a && position[8] == -a)
-                || (position[2] + position[8] == 2 * a && position[5] == -a)
-                || (position[5] + position[8] == 2 * a && position[2] == -a)
-                || (position[0] + position[4] == 2 * a && position[8] == -a)
-                || (position[0] + position[8] == 2 * a && position[4] == -a)
-                || (position[4] + position[8] == 2 * a && position[0] == -a)
-                || (position[2] + position[4] == 2 * a && position[6] == -a)
-                || (position[2] + position[6] == 2 * a && position[4] == -a)
-                || (position[4] + position[6] == 2 * a && position[2] == -a)) {
+        // Decrease points for something
+        if (someOtherTally(board, 1)) {
             eval -= 9;
         }
 
-        a = -2;
-        if (position[0] + position[1] + position[2] == a || position[3] + position[4] + position[5] == a
-                || position[6] + position[7] + position[8] == a) {
+        // Add points for our pairs
+        if (tallyBoardByType(board, 2, VictoryType.HORIZONTAL)) {
             eval += 6;
         }
-        if (position[0] + position[3] + position[6] == a || position[1] + position[4] + position[7] == a
-                || position[2] + position[5] + position[8] == a) {
+        if (tallyBoardByType(board, 2, VictoryType.VERTICAL)) {
             eval += 6;
         }
-        if (position[0] + position[4] + position[8] == a || position[2] + position[4] + position[6] == a) {
+        if (tallyBoardByType(board, 2, VictoryType.DIAGONAL)) {
             eval += 7;
         }
 
-        a = 1;
-        // same as above but for opposite player
-        if ((position[0] + position[1] == 2 * a && position[2] == -a)
-                || (position[1] + position[2] == 2 * a && position[0] == -a)
-                || (position[0] + position[2] == 2 * a && position[1] == -a)
-                || (position[3] + position[4] == 2 * a && position[5] == -a)
-                || (position[3] + position[5] == 2 * a && position[4] == -a)
-                || (position[5] + position[4] == 2 * a && position[3] == -a)
-                || (position[6] + position[7] == 2 * a && position[8] == -a)
-                || (position[6] + position[8] == 2 * a && position[7] == -a)
-                || (position[7] + position[8] == 2 * a && position[6] == -a)
-                || (position[0] + position[3] == 2 * a && position[6] == -a)
-                || (position[0] + position[6] == 2 * a && position[3] == -a)
-                || (position[3] + position[6] == 2 * a && position[0] == -a)
-                || (position[1] + position[4] == 2 * a && position[7] == -a)
-                || (position[1] + position[7] == 2 * a && position[4] == -a)
-                || (position[4] + position[7] == 2 * a && position[1] == -a)
-                || (position[2] + position[5] == 2 * a && position[8] == -a)
-                || (position[2] + position[8] == 2 * a && position[5] == -a)
-                || (position[5] + position[8] == 2 * a && position[2] == -a)
-                || (position[0] + position[4] == 2 * a && position[8] == -a)
-                || (position[0] + position[8] == 2 * a && position[4] == -a)
-                || (position[4] + position[8] == 2 * a && position[0] == -a)
-                || (position[2] + position[4] == 2 * a && position[6] == -a)
-                || (position[2] + position[6] == 2 * a && position[4] == -a)
-                || (position[4] + position[6] == 2 * a && position[2] == -a)) {
+        // Add points for something
+        if (someOtherTally(board, -1)) {
             eval += 9;
         }
 
-        eval -= checkWinCondition(position) * 12; // why tf is it 12
+        eval += checkWinCondition(board) * 12; // why tf is it 12
 
         return eval;
     }
 
-    /**
-     * MOST IMPORTANT HELPER
-     * 
-     * @param position array
-     * @param board    int
-     * @return numerical evaluation of the entire game board in it's current state
-     */
-    public static int evalGame(int[][] position, int board) {
-        int val = 0;
-        int[] mainboard = new int[9];
-        double[] evaluator = { 1.4, 1, 1.4, 1, 1.75, 1, 1.4, 1, 1.4 }; // heuristics we can change later?
+    public static double evaluateGame(int[][] gameBoard, int currentBoard) {
+        double eval = 0;
+        ArrayList<Integer> mainBoard = new ArrayList<>();
+        double[] evaluator = {1.4, 1, 1.4, 1, 1.75, 1, 1.4, 1, 1.4};
 
         for (int i = 0; i < 9; i++) {
-            val += evaluateSquare(position[i]) * (1.5 * evaluator[i]); // why 1.5 lol
-            if (i == board) {
-                val += evaluateSquare(position[i]) * evaluator[i];
+            eval += evaluateBoard(gameBoard[i]) * 1.5 * evaluator[i];
+            if (i == currentBoard) {
+                eval += evaluateBoard(gameBoard[i])*evaluator[i];
             }
-            int tempEval = checkWinCondition(position[i]);
-            val -= tempEval * evaluator[i];
-            mainboard[i] = tempEval; // same as mainboard.push(tempEval) ?
+            int potentialWinner = checkWinCondition(gameBoard[i]);
+            eval -= potentialWinner * evaluator[i];
+            mainBoard.add(potentialWinner);
         }
 
-        val -= checkWinCondition(mainboard) * 5000;
-        val += evaluateSquare(mainboard) * 150;
-        return val;
+        int[] mainBoardArray = mainBoard.stream().mapToInt(i->i).toArray();
+
+        eval += checkWinCondition(mainBoardArray) * 5000;
+        eval += evaluateBoard(mainBoardArray)*150;
+
+        return eval;
     }
 
     /**
@@ -255,23 +219,23 @@ public class Minimax {
      * @param maxPlayer
      * @return HashMap<String, Integer>
      */
-    public static HashMap<String, Integer> minimax(int[][] position, int boardTurn, int depth, int alpha, int beta,
+    public static HashMap<String, Double> minimax(int[][] position, int boardTurn, int depth, Double alpha, Double beta,
                                                    boolean maxPlayer) {
         RUNS++;
         //HashMap evals = new HashMap<String, Integer>();
 
-        int templay = -1;
-        Integer infinity = Integer.MAX_VALUE;
-        Integer negInf = Integer.MIN_VALUE;
+        double possibleScore = -1;
+        Double infinity = Double.MAX_VALUE;
+        Double negInf = Double.MIN_VALUE;
 
-        int calc = evalGame(position, boardTurn);
+        double calc = evaluateGame(position, boardTurn);
 
         String xC = "X";
         String yT = "Y";
 
         if (depth <= 0 || Math.abs(calc) > 5000) {
             evals.put(xC, calc);
-            evals.put(yT, templay);
+            evals.put(yT, possibleScore);
 
             return evals;
         }
@@ -296,22 +260,22 @@ public class Minimax {
         }
 
         if (maxPlayer) {
-            int maxEval = negInf;
+            Double maxEval = negInf;
             for (int x = 0; x < 9; x++) {
-                Integer evalu = negInf;
+                Double evalu = negInf;
                 // if you can play on any board, check every position
                 if (boardTurn == -1) {
                     for (int y = 0; y < 9; y++) {
                         // except the boards that have victories
                         if (checkWinCondition(position[x]) == 0) {
                             if (position[x][y] == 0) {
-                                position[x][y] = bot;
+                                position[x][y] = player2Number;
                                 evals = minimax(position, y, depth - 1, alpha, beta, false);
                                 try {
-                                    evalu = (int) evals.get(xC);
+                                    evalu = evals.get(xC);
                                     System.out.println("Evals: " + evals.get(evalu));
                                 } catch (NullPointerException e) {
-                                    evalu = Integer.MIN_VALUE;
+                                    evalu = Double.MIN_VALUE;
                                     evals.put("X", evalu);
 
                                     System.out.println("Getting minval???");
@@ -323,7 +287,7 @@ public class Minimax {
                             if (evalu > maxEval) {
                                 maxEval = evalu;
                                 evals.put("X", maxEval);
-                                templay = x;
+                                possibleScore = x;
                             }
                             alpha = Math.max(alpha, evalu);
                         }
@@ -335,20 +299,20 @@ public class Minimax {
                     // if specific board to play on, iterate through it's squares
                 } else {
                     if (position[boardTurn][x] == 0) {
-                        position[boardTurn][x] = bot;
+                        position[boardTurn][x] = player2Number;
                         evals = minimax(position, x, depth - 1, alpha, beta, false);
                         position[boardTurn][x] = 0;
                     }
 
-                    int play = (int) evals.get(xC); // var blop = evalut.mE;
+                    Double play = evals.get(xC); // var blop = evalut.mE;
                     if (play > maxEval) {
                         maxEval = play;
-                        evals.put(yT, templay);
+                        evals.put(yT, possibleScore);
                         //outputMap.put("Y", maxEval);
                         // saves the board you should play on, so that it can be passed on when AI can
                         // play on any board
                         try {
-                            templay = (int) evals.get(yT); // tmpPlay = evalut.tP;
+                            possibleScore = evals.get(yT); // tmpPlay = evalut.tP;
                         } catch(NullPointerException e) {
                             System.out.println("Templay in hashmap is null");
                         }
@@ -362,27 +326,27 @@ public class Minimax {
 //                outputMap.put("X", maxEval);
 //                outputMap.put("Y", templay);
                 evals.put("X", maxEval);
-                evals.put("Y", templay);
+                evals.put("Y", possibleScore);
 //                System.out.println("Test Here:");
                 System.out.println("MaxEval: " + maxEval);
-                System.out.println("Templay: " + templay);
+                System.out.println("Templay: " + possibleScore);
                 return (evals);
             }
         } else { // same but for minimizing player
             for (int x = 0; x < 9; x++) {
-                int evaluo = infinity;
+                Double evaluo = infinity;
                 if (boardTurn == -1) {
                     for (int y = 0; y < 9; y++) {
                         // except the boards that have victories
                         if (checkWinCondition(position[x]) == 0) {
                             if (position[x][y] == 0) {
-                                position[x][y] = player;
+                                position[x][y] = player1Number;
                                 evals = minimax(position, y, depth - 1, alpha, beta, false);
                                 try {
-                                    evaluo = (int) evals.get(xC);
+                                    evaluo = evals.get(xC);
                                     evals.put("X", evaluo);
                                 } catch (NullPointerException e) {
-                                    evaluo = Integer.MIN_VALUE;
+                                    evaluo = Double.MIN_VALUE;
                                     evals.put("X", evaluo);
                                 }
 
@@ -390,8 +354,8 @@ public class Minimax {
                             }
                             if (evaluo > infinity) {
                                 negInf = evaluo;
-                                templay = x;
-                                evals.put("Y", templay);
+                                possibleScore = x;
+                                evals.put("Y", possibleScore);
 
                             }
                             beta = Math.min(beta, evaluo);
@@ -402,16 +366,16 @@ public class Minimax {
                         break;
                     } else {
                         if (position[boardTurn][x] == 0) {
-                            position[boardTurn][x] = player;
+                            position[boardTurn][x] = player1Number;
                             evals = minimax(position, x, depth - 1, alpha, beta, true);
-                            evaluo = (int) evals.get(xC);
+                            evaluo = evals.get(xC);
                             position[boardTurn][x] = 0;
                         }
-                        int blay = evaluo;
+                        Double blay = evaluo;
                         if (blay < negInf) {
                             negInf = blay;
-                            templay = (int) evals.get(yT);
-                            evals.put("Y", templay);
+                            possibleScore = evals.get(yT);
+                            evals.put("Y", possibleScore);
                         }
                         beta = Math.min(beta, blay);
                         // alphabeta pruning
@@ -435,10 +399,10 @@ public class Minimax {
 
     public static void game() {
         int[][] boardArrayCopy = Board.boardArray.clone();
-        Integer[] bestScore = new Integer[]{Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
+        Double[] bestScore = new Double[]{Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE};
         if(Reader.ourTurn()) {
             int bestMove = -1;
-            bestScore = new Integer[]{Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
+            bestScore = new Double[]{Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE};
 
             int[] checkWinners = new int[9];
             int count = 0;
@@ -456,17 +420,17 @@ public class Minimax {
             }
 
             if(currentBoard == -1 || checkWinCondition(boardToRow(Board.boardArray, currentBoard)) != 0) {
-                HashMap<String, Integer> savedMap = new HashMap<>();
-                int savedNumber;
+                HashMap<String, Double> savedMap = new HashMap<>();
+                Double savedNumber;
 
                 if(MOVES < 10) {
-                    savedMap = minimax(Board.boardArray, -1, Math.min(4, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                    savedMap = minimax(Board.boardArray, -1, Math.min(4, count), Double.MIN_VALUE, Double.MAX_VALUE, true);
                 } else if(MOVES < 18) {
-                    savedMap = minimax(Board.boardArray, -1, Math.min(5, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                    savedMap = minimax(Board.boardArray, -1, Math.min(5, count), Double.MIN_VALUE, Double.MAX_VALUE, true);
                 } else {
-                    savedMap = minimax(Board.boardArray, -1, Math.min(6, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                    savedMap = minimax(Board.boardArray, -1, Math.min(6, count), Double.MIN_VALUE, Double.MAX_VALUE, true);
                 }
-                savedNumber = (int) savedMap.get("Y");
+                savedNumber = savedMap.get("Y");
             }
 
             int[] boardRow = boardToRow(Board.boardArray, currentBoard);
@@ -483,7 +447,7 @@ public class Minimax {
                 for(int i = 0; i < 9; i++) {
                     if(boardRow[i] == 0) {
                         //TODO Update evaluatePos
-                        int score = evaluatePos(boardRow, i)*45;
+                        double score = evaluatePos(boardRow, i)*45;
                         //int score = evaluatePos(boardRow, i,  currentTurn)*45;
                     }
                 }
@@ -495,17 +459,17 @@ public class Minimax {
                             boardArrayCopy[currentBoard][b] = Main.game.player1.playerNumber;
                             //Board.boardArray[currentBoard][b] == ai;
                             int savedNumber = 0;
-                            HashMap<String, Integer> savedMap = new HashMap<>();
+                            HashMap<String, Double> savedMap = new HashMap<>();
                             if(MOVES < 20) {
-                                savedMap = minimax(Board.boardArray, -1, Math.min(4, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                                savedMap = minimax(Board.boardArray, -1, Math.min(4, count), Double.MIN_VALUE, Double.MAX_VALUE, true);
                             } else if(MOVES < 18) {
-                                savedMap = minimax(Board.boardArray, -1, Math.min(5, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                                savedMap = minimax(Board.boardArray, -1, Math.min(5, count), Double.MIN_VALUE, Double.MAX_VALUE, true);
                             } else {
-                                savedMap = minimax(Board.boardArray, -1, Math.min(6, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                                savedMap = minimax(Board.boardArray, -1, Math.min(6, count), Double.MIN_VALUE, Double.MAX_VALUE, true);
                             }
 
-                            int score2 = savedMap.get("X");
-                            int score4 = savedMap.get("Y");
+                            Double score2 = savedMap.get("X");
+                            Double score4 = savedMap.get("Y");
                             //Board.boardArray[currentBoard][b] = 0;
                             boardArrayCopy[currentBoard][b] = Main.game.player1.playerNumber;
                             bestScore[b] += score2;
@@ -533,57 +497,5 @@ public class Minimax {
 
         }
         currentTurn = -currentTurn;
-    }
-
-    public static void game2() {
-
-        int bestMove = -1;
-        Integer[] bestScore = new Integer[]{Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
-
-        int count = 0;
-
-        for(int i = 0; i < 9; i++) {
-            int[] boardRow = boardToRow(Board.boardArray, i);
-            for(int j = 0; j < boardRow.length; j++) {
-                if(boardRow[j] == 0) {
-                    count++;
-                }
-            }
-        }
-
-        HashMap<String, Integer> savedMap = new HashMap<>();
-
-        savedMap = minimax(Board.boardArray, -1, 4, Integer.MIN_VALUE, Integer.MIN_VALUE, true);
-
-        currentBoard = savedMap.get("Y");
-        System.out.println("CurrentBoard: " + currentBoard);
-
-        int[] boardRow = boardToRow(Board.boardArray, currentBoard);
-        for(int p = 0; p < boardRow.length; p++) {
-            if(boardRow[p] == 0) {
-                bestMove = p;
-                break;
-            }
-        }
-
-        if(bestMove != -1) {
-            for(int a = 0; a < 9; a++) {
-                if(Board.boardArray[currentBoard][a] == 0) {
-                    int score = evaluatePos(Board.boardArray[currentBoard], a)*45;
-                    bestScore[a] = score;
-                }
-            }
-        }
-
-        for(int b = 0; b < 9; b++) {
-            if(checkWinCondition(Board.boardArray[currentBoard]) == 0) {
-                if(Board.boardArray[currentBoard][b] == 0) {
-                    //Board.boardArray
-                }
-            }
-        }
-
-
-
     }
 }
