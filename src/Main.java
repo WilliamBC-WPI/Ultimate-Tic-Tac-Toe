@@ -38,6 +38,7 @@ public class Main {
         }
 
         if (Reader.ourTurn()) {
+            Minimax.game();
             String userMove = Reader.readMove();
             int[] locationToPlay = {Reader.parseMove(userMove)[1], Reader.parseMove(userMove)[2]};
             game.makeMove(game.player1.playerNumber, locationToPlay);

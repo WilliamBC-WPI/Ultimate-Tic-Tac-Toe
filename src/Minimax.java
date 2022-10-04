@@ -3,11 +3,18 @@ import java.util.stream.IntStream;
 
 public class Minimax {
 
-    int RUNS = 0;
-    int MOVES = 0;
+    static HashMap<String, Integer> evals = new HashMap<String, Integer>();
+
+    static int RUNS = 0;
+    static int MOVES = 0;
 
     static int bot = -1;
     static int player = 1;
+
+    static int currentTurn = 1;
+    //static int bestMove = -1;
+    public static int currentBoard = 4;
+    Integer[] bestScore = new Integer[]{Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
 
     /**
      * helper that checks if a normal tic tac toe game has been won
@@ -111,7 +118,7 @@ public class Minimax {
      * 
      * @param position on basic tictactoe board
      */
-    public int evaluateSquare(int[] position) {
+    public static int evaluateSquare(int[] position) {
         int eval = 0;
         double[] points = { 0.2, 0.17, 0.2, 0.17, 0.22, 0.17, 0.2, 0.17, 0.2 }; // heuristic
 
@@ -219,7 +226,7 @@ public class Minimax {
      * @param board    int
      * @return numerical evaluation of the entire game board in it's current state
      */
-    public int evalGame(int[][] position, int board) {
+    public static int evalGame(int[][] position, int board) {
         int val = 0;
         int[] mainboard = new int[9];
         double[] evaluator = { 1.4, 1, 1.4, 1, 1.75, 1, 1.4, 1, 1.4 }; // heuristics we can change later?
@@ -241,18 +248,17 @@ public class Minimax {
 
     /**
      * @param position
-     * @param boardToPlay // int
+     * @param //boardToPlay // int
      * @param depth
      * @param alpha
      * @param beta        // pruning
      * @param maxPlayer
      * @return HashMap<String, Integer>
      */
-    public HashMap<String, Integer> minimax(int[][] position, int boardTurn, int depth, int alpha, int beta,
-            boolean maxPlayer) {
+    public static HashMap<String, Integer> minimax(int[][] position, int boardTurn, int depth, int alpha, int beta,
+                                                   boolean maxPlayer) {
         RUNS++;
-        HashMap outputMap = new HashMap<String, Integer>();
-        HashMap mapp = new HashMap<String, Integer>();
+        //HashMap evals = new HashMap<String, Integer>();
 
         int templay = -1;
         Integer infinity = Integer.MAX_VALUE;
@@ -264,10 +270,10 @@ public class Minimax {
         String yT = "Y";
 
         if (depth <= 0 || Math.abs(calc) > 5000) {
-            outputMap.put(xC, calc);
-            outputMap.put(yT, templay);
+            evals.put(xC, calc);
+            evals.put(yT, templay);
 
-            return outputMap;
+            return evals;
         }
         // if board to play on = -1, play on any board
         if ((boardTurn != -1) && (checkWinCondition(position[boardTurn]) != 0)) {
@@ -275,7 +281,16 @@ public class Minimax {
         }
 
         // if board is full
-        boolean contains = IntStream.of(position[boardTurn]).anyMatch(x -> x == 0); // https://stackoverflow.com/questions/1128723/how-do-i-determine-whether-an-array-contains-a-particular-value-in-java
+        boolean contains = false; //= IntStream.of(position[boardTurn]).anyMatch(x -> x == 0);// https://stackoverflow.com/questions/1128723/how-do-i-determine-whether-an-array-contains-a-particular-value-in-java
+
+        if(boardTurn >= 0) {
+            for(int i = 0; i < position[boardTurn].length; i++) {
+                if(position[boardTurn][i] == 0) {
+                    contains = true;
+                }
+            }
+        }
+
         if (boardTurn != -1 && !(contains)) {
             boardTurn = -1;
         }
@@ -283,7 +298,7 @@ public class Minimax {
         if (maxPlayer) {
             int maxEval = negInf;
             for (int x = 0; x < 9; x++) {
-                int evalu = negInf;
+                Integer evalu = negInf;
                 // if you can play on any board, check every position
                 if (boardTurn == -1) {
                     for (int y = 0; y < 9; y++) {
@@ -291,12 +306,23 @@ public class Minimax {
                         if (checkWinCondition(position[x]) == 0) {
                             if (position[x][y] == 0) {
                                 position[x][y] = bot;
-                                mapp = minimax(position, y, depth - 1, alpha, beta, false);
-                                evalu = (int) mapp.get(xC);
+                                evals = minimax(position, y, depth - 1, alpha, beta, false);
+                                try {
+                                    evalu = (int) evals.get(xC);
+                                    System.out.println("Evals: " + evals.get(evalu));
+                                } catch (NullPointerException e) {
+                                    evalu = Integer.MIN_VALUE;
+                                    evals.put("X", evalu);
+
+                                    System.out.println("Getting minval???");
+                                }
+
+
                                 position[x][y] = 0;
                             }
                             if (evalu > maxEval) {
                                 maxEval = evalu;
+                                evals.put("X", maxEval);
                                 templay = x;
                             }
                             alpha = Math.max(alpha, evalu);
@@ -307,31 +333,40 @@ public class Minimax {
                         break;
                     }
                     // if specific board to play on, iterate through it's squares
-                    else {
-                        if (position[boardTurn][x] == 0) {
-                            position[boardTurn][x] = bot;
-                            mapp = minimax(position, x, depth - 1, alpha, beta, false);
-                            position[boardTurn][x] = 0;
-                        }
+                } else {
+                    if (position[boardTurn][x] == 0) {
+                        position[boardTurn][x] = bot;
+                        evals = minimax(position, x, depth - 1, alpha, beta, false);
+                        position[boardTurn][x] = 0;
+                    }
 
-                        int play = (int) mapp.get(xC); // var blop = evalut.mE;
-                        // int play1 = mapp.X;
-                        if (play > maxEval) {
-                            maxEval = play;
-                            // saves the board you should play on, so that it can be passed on when AI can
-                            // play on any board
-                            templay = (int) mapp.get(yT); // tmpPlay = evalut.tP;
-                        }
-                        alpha = Math.max(alpha, play);
-                        // alphabeta pruning
-                        if (beta <= alpha) {
-                            break;
+                    int play = (int) evals.get(xC); // var blop = evalut.mE;
+                    if (play > maxEval) {
+                        maxEval = play;
+                        evals.put(yT, templay);
+                        //outputMap.put("Y", maxEval);
+                        // saves the board you should play on, so that it can be passed on when AI can
+                        // play on any board
+                        try {
+                            templay = (int) evals.get(yT); // tmpPlay = evalut.tP;
+                        } catch(NullPointerException e) {
+                            System.out.println("Templay in hashmap is null");
                         }
                     }
+                    alpha = Math.max(alpha, play);
+                    // alphabeta pruning
+                    if (beta <= alpha) {
+                        break;
+                    }
                 }
-                outputMap.put("X", maxEval);
-                outputMap.put("Y", templay);
-                return (outputMap);
+//                outputMap.put("X", maxEval);
+//                outputMap.put("Y", templay);
+                evals.put("X", maxEval);
+                evals.put("Y", templay);
+//                System.out.println("Test Here:");
+                System.out.println("MaxEval: " + maxEval);
+                System.out.println("Templay: " + templay);
+                return (evals);
             }
         } else { // same but for minimizing player
             for (int x = 0; x < 9; x++) {
@@ -342,12 +377,22 @@ public class Minimax {
                         if (checkWinCondition(position[x]) == 0) {
                             if (position[x][y] == 0) {
                                 position[x][y] = player;
-                                evaluo = minimax(position, y, depth - 1, alpha, beta, false).get(x); // double check
+                                evals = minimax(position, y, depth - 1, alpha, beta, false);
+                                try {
+                                    evaluo = (int) evals.get(xC);
+                                    evals.put("X", evaluo);
+                                } catch (NullPointerException e) {
+                                    evaluo = Integer.MIN_VALUE;
+                                    evals.put("X", evaluo);
+                                }
+
                                 position[x][y] = 0;
                             }
                             if (evaluo > infinity) {
                                 negInf = evaluo;
                                 templay = x;
+                                evals.put("Y", templay);
+
                             }
                             beta = Math.min(beta, evaluo);
                         }
@@ -358,14 +403,15 @@ public class Minimax {
                     } else {
                         if (position[boardTurn][x] == 0) {
                             position[boardTurn][x] = player;
-                            mapp = minimax(position, x, depth - 1, alpha, beta, true);
-                            evaluo = (int) mapp.get(xC);
+                            evals = minimax(position, x, depth - 1, alpha, beta, true);
+                            evaluo = (int) evals.get(xC);
                             position[boardTurn][x] = 0;
                         }
                         int blay = evaluo;
                         if (blay < negInf) {
                             negInf = blay;
-                            templay = (int) mapp.get(yT);
+                            templay = (int) evals.get(yT);
+                            evals.put("Y", templay);
                         }
                         beta = Math.min(beta, blay);
                         // alphabeta pruning
@@ -376,6 +422,168 @@ public class Minimax {
                 }
             }
         }
-        return (outputMap);
+        return (evals);
+    }
+
+    public static int[] boardToRow(int[][] board, int row) {
+        int[] rtnAr = new int[board[row].length];
+        for(int i = 0; i < board[row].length; i++) {
+            rtnAr[i] = board[row][i];
+        }
+        return rtnAr;
+    }
+
+    public static void game() {
+        int[][] boardArrayCopy = Board.boardArray.clone();
+        Integer[] bestScore = new Integer[]{Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
+        if(Reader.ourTurn()) {
+            int bestMove = -1;
+            bestScore = new Integer[]{Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
+
+            int[] checkWinners = new int[9];
+            int count = 0;
+            for(int i = 0; i < Board.boardArray.length; i++) {
+                for(int j = 0; j < Board.boardArray[i].length; j++) {
+                    checkWinners[j] = Board.boardArray[i][j];
+                }
+                if(checkWinCondition(checkWinners) == 0) {
+                    for(int t = 0; t < checkWinners.length; t++) {
+                        if(checkWinners[t] == 0) {
+                            count++;
+                        }
+                    }
+                }
+            }
+
+            if(currentBoard == -1 || checkWinCondition(boardToRow(Board.boardArray, currentBoard)) != 0) {
+                HashMap<String, Integer> savedMap = new HashMap<>();
+                int savedNumber;
+
+                if(MOVES < 10) {
+                    savedMap = minimax(Board.boardArray, -1, Math.min(4, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                } else if(MOVES < 18) {
+                    savedMap = minimax(Board.boardArray, -1, Math.min(5, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                } else {
+                    savedMap = minimax(Board.boardArray, -1, Math.min(6, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                }
+                savedNumber = (int) savedMap.get("Y");
+            }
+
+            int[] boardRow = boardToRow(Board.boardArray, currentBoard);
+            for(int p = 0; p < boardRow.length; p++) {
+                if(boardRow[p] == 0) {
+                    bestMove = p;
+                    break;
+                }
+            }
+
+            System.out.println("bestMove: " + bestMove);
+            if(bestMove != -1) {
+
+                for(int i = 0; i < 9; i++) {
+                    if(boardRow[i] == 0) {
+                        //TODO Update evaluatePos
+                        int score = evaluatePos(boardRow, i)*45;
+                        //int score = evaluatePos(boardRow, i,  currentTurn)*45;
+                    }
+                }
+
+                for(int b = 0; b < 9; b++) {
+                    if(checkWinCondition(boardRow) == 0) {
+                        if(Board.boardArray[currentBoard][b] == 0) {
+                            //TODO
+                            boardArrayCopy[currentBoard][b] = Main.game.player1.playerNumber;
+                            //Board.boardArray[currentBoard][b] == ai;
+                            int savedNumber = 0;
+                            HashMap<String, Integer> savedMap = new HashMap<>();
+                            if(MOVES < 20) {
+                                savedMap = minimax(Board.boardArray, -1, Math.min(4, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                            } else if(MOVES < 18) {
+                                savedMap = minimax(Board.boardArray, -1, Math.min(5, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                            } else {
+                                savedMap = minimax(Board.boardArray, -1, Math.min(6, count), Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+                            }
+
+                            int score2 = savedMap.get("X");
+                            int score4 = savedMap.get("Y");
+                            //Board.boardArray[currentBoard][b] = 0;
+                            boardArrayCopy[currentBoard][b] = Main.game.player1.playerNumber;
+                            bestScore[b] += score2;
+
+                        }
+                    }
+                }
+
+                for(int i = 0; i < bestScore.length; i++) {
+                    if(bestScore[i] > bestScore[bestMove]) {
+                        bestMove = i;
+                    }
+                }
+
+                //System.out.println("boardArrayCopy[currentBoard][bestMove]: " + boardArrayCopy[currentBoard][bestMove]);
+                System.out.println("Best move is: " + "CB: " + currentBoard + " BM: " + bestMove);
+                if(boardArrayCopy[currentBoard][bestMove] == 0) {
+                    System.out.println("Best move is: " + "CB: " + currentBoard + " BM: " + bestMove);
+                    //Board.boardArray = boardArrayCopy;
+                }
+
+
+            }
+
+
+        }
+        currentTurn = -currentTurn;
+    }
+
+    public static void game2() {
+
+        int bestMove = -1;
+        Integer[] bestScore = new Integer[]{Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
+
+        int count = 0;
+
+        for(int i = 0; i < 9; i++) {
+            int[] boardRow = boardToRow(Board.boardArray, i);
+            for(int j = 0; j < boardRow.length; j++) {
+                if(boardRow[j] == 0) {
+                    count++;
+                }
+            }
+        }
+
+        HashMap<String, Integer> savedMap = new HashMap<>();
+
+        savedMap = minimax(Board.boardArray, -1, 4, Integer.MIN_VALUE, Integer.MIN_VALUE, true);
+
+        currentBoard = savedMap.get("Y");
+        System.out.println("CurrentBoard: " + currentBoard);
+
+        int[] boardRow = boardToRow(Board.boardArray, currentBoard);
+        for(int p = 0; p < boardRow.length; p++) {
+            if(boardRow[p] == 0) {
+                bestMove = p;
+                break;
+            }
+        }
+
+        if(bestMove != -1) {
+            for(int a = 0; a < 9; a++) {
+                if(Board.boardArray[currentBoard][a] == 0) {
+                    int score = evaluatePos(Board.boardArray[currentBoard], a)*45;
+                    bestScore[a] = score;
+                }
+            }
+        }
+
+        for(int b = 0; b < 9; b++) {
+            if(checkWinCondition(Board.boardArray[currentBoard]) == 0) {
+                if(Board.boardArray[currentBoard][b] == 0) {
+                    //Board.boardArray
+                }
+            }
+        }
+
+
+
     }
 }
