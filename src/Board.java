@@ -2,7 +2,7 @@ import java.util.Arrays;
 
 public class Board {
 
-    static int[][] boardArray = new int[9][9];
+    public static int[][] boardArray = new int[9][9];
     static int[] mainBoard = new int[9];
 
     public static void initializeBoards() {

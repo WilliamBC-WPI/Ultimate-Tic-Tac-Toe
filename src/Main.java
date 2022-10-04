@@ -38,6 +38,9 @@ public class Main {
         }
 
         if (Reader.ourTurn()) {
+            Minimax.game(); //TODO Causing errors
+            //This Minimax.game() call should just print out the best move for now
+            //The user should then input the move, this is just for testing
             String userMove = Reader.readMove();
             int[] locationToPlay = {Reader.parseMove(userMove)[1], Reader.parseMove(userMove)[2]};
             game.makeMove(game.player1.playerNumber, locationToPlay);
