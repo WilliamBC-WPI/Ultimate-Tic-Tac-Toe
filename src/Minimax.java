@@ -6,8 +6,8 @@ public class Minimax {
     int RUNS = 0;
     int MOVES = 0;
 
-    int bot = -1;
-    int player = 1;
+    static int bot = -1;
+    static int player = 1;
 
     /**
      * helper that checks if a normal tic tac toe game has been won
@@ -16,7 +16,7 @@ public class Minimax {
      * @param position
      * @return 1 or -1 if a specific player has won, returns 0 if no one has won
      */
-    public int checkWinCondition(int[] position) {
+    public static int checkWinCondition(int[] position) {
         int a = 1;
         // SINGLE ARRAY
         if (position[0] + position[1] + position[2] == a * 3 || position[3] + position[4] + position[5] == a * 3
