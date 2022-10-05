@@ -9,17 +9,14 @@ public class Main {
     public static final String MOVES_PATH = "../Referee/uttt_referee_v7/move_file";
     public static final String FILEPATH = "../Referee/uttt_referee_v7";
     public static final String END_GAME_PATH = "../Referee/uttt_referee_v7/end_game";
+    static String lastMove = "";
 
     public static void main(String[] args){
-        Main.startGame();
+        Main.startGame(args[0]);
     }
 
-    public static void startGame() {
-        game = new Game("Us", "Them");
-        Board.mainBoard[4] = 1;
-        Board.mainBoard[5] = 1;
-        System.out.println(Minimax.evaluateBoard(Board.mainBoard));
-        Board.printBoardArray();
+    public static void startGame(String playerName) {
+        game = new Game(playerName, Reader.getOtherPlayerName());
 
         playFirstFourMoves();
        while (!Reader.gameOver()) {
@@ -29,22 +26,33 @@ public class Main {
     }
 
     public static void turn(Game game) {
-        int currentPlayer = Reader.whosTurn();
-
         File movesFile = new File(Main.MOVES_PATH);
-        String whoMadeLastMoveName = "";
+        File firstFourMovesFile = new File(FIRST_FOUR_MOVES);
         ArrayList<String> moveList = new ArrayList<>();
 
-        if(Reader.doesFileContain(movesFile)) {
+        if(Reader.doesFileContain(firstFourMovesFile)) {
             moveList = Reader.readFile(FIRST_FOUR_MOVES);
-            String lastMove = moveList.get(moveList.size()-1);
-            whoMadeLastMoveName = Reader.getPlayerNameFromMoveString(lastMove);
+            lastMove = moveList.get(moveList.size()-1);
         }
 
         if (Reader.ourTurn()) {
-            Minimax.game();
-            String userMove = Reader.readMove();
-            int[] locationToPlay = {Reader.parseMove(userMove)[1], Reader.parseMove(userMove)[2]};
+            if (Reader.doesFileContain(movesFile)) {
+                lastMove = Reader.readFile(MOVES_PATH).get(0);
+            }
+            int[] locationToPlay = {Reader.parseMove(lastMove)[1], Reader.parseMove(lastMove)[2]};
+            System.out.println("the location is " + Arrays.toString(locationToPlay));
+            game.makeMove(game.player2.playerNumber, locationToPlay);
+
+            String userMove = "";
+
+            System.out.println(lastMove);
+
+                int[] moveArray = Reader.parseMove(lastMove);
+                int[] bestMoveArray = Minimax.findBestMove(Board.boardArray, moveArray[2]);
+                System.out.println("the best move array is" + Arrays.toString(bestMoveArray));
+                userMove = game.moveArrayToString(bestMoveArray);
+
+            locationToPlay = new int[]{Reader.parseMove(userMove)[1], Reader.parseMove(userMove)[2]};
             game.makeMove(game.player1.playerNumber, locationToPlay);
             Reader.writeToFile(userMove);
             try {
@@ -62,11 +70,6 @@ public class Main {
                     throw new RuntimeException(e);
                 }
             }
-
-            String lastMove = Reader.readFile(MOVES_PATH).get(0);
-            int[] locationToPlay = {Reader.parseMove(lastMove)[1], Reader.parseMove(lastMove)[2]};
-            System.out.println("the location is " + Arrays.toString(locationToPlay));
-            game.makeMove(game.player2.playerNumber, locationToPlay);
         }
     }
 
@@ -77,7 +80,6 @@ public class Main {
             int[] locationToPlay = {Reader.parseMove(firstFourMoves.get(i))[1],
                     Reader.parseMove(firstFourMoves.get(i))[2]};
             game.makeMove(playerNumber, locationToPlay);
-            Board.printBoardArray();
         }
     }
 }
