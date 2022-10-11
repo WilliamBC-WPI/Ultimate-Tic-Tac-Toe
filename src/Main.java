@@ -5,10 +5,10 @@ import java.util.Arrays;
 
 public class Main {
     public static Game game;
-    public static final String FIRST_FOUR_MOVES = "../Referee/uttt_referee_v7/first_four_moves";
-    public static final String MOVES_PATH = "../Referee/uttt_referee_v7/move_file";
-    public static final String FILEPATH = "../Referee/uttt_referee_v7";
-    public static final String END_GAME_PATH = "../Referee/uttt_referee_v7/end_game";
+    public static final String FIRST_FOUR_MOVES = "Referee/uttt_referee_v7/first_four_moves";
+    public static final String MOVES_PATH = "Referee/uttt_referee_v7/move_file";
+    public static final String FILEPATH = "Referee/uttt_referee_v7";
+    public static final String END_GAME_PATH = "Referee/uttt_referee_v7/end_game";
     static String lastMove = "";
 
     public static void main(String[] args){

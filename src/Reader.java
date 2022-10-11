@@ -101,7 +101,7 @@ public class Reader {
     }
 
     public static String getGoFileName() {
-        return "../Referee/uttt_referee_v7/" + Main.game.player1.playerName+ ".go";
+        return "Referee/uttt_referee_v7/" + Main.game.player1.playerName+ ".go";
     }
 
     public static boolean ourTurn() {
