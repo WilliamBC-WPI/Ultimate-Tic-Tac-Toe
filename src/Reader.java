@@ -20,10 +20,8 @@ public class Reader {
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                System.out.println("File not found");
             }
         } else {
-            System.out.println("That don't exist my guy!");
         }
         return output;
     }

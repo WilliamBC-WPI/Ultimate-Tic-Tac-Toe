@@ -263,7 +263,7 @@ public class Minimax {
         } else {
             double minEval = MAX_VALUE;
             for (int i = 0; i < 9; i++) {
-                double eval = MIN_VALUE;
+                double eval = MAX_VALUE;
                 if (boardToPlayOn == -1) {
                     for (int j = 0; j < 9; j++) {
                         if (checkWinCondition(board[i]) == 0) {

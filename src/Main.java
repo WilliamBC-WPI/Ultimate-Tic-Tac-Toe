@@ -40,12 +40,9 @@ public class Main {
                 lastMove = Reader.readFile(MOVES_PATH).get(0);
             }
             int[] locationToPlay = {Reader.parseMove(lastMove)[1], Reader.parseMove(lastMove)[2]};
-            System.out.println("the location is " + Arrays.toString(locationToPlay));
             game.makeMove(game.player2.playerNumber, locationToPlay);
 
             String userMove = "";
-
-            System.out.println(lastMove);
 
                 int[] moveArray = Reader.parseMove(lastMove);
                 int[] bestMoveArray = Minimax.findBestMove(Board.boardArray, moveArray[2]);

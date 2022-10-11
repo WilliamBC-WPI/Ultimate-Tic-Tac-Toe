@@ -15,7 +15,6 @@ public class Game {
      *                       and the second element is the position on the board to play
      */
     public void makeMove(int playerNumber, int[] locationToPlay) {
-        System.out.println(locationToPlay[0] + ", " + locationToPlay[1]);
         Board.boardArray[locationToPlay[0]][locationToPlay[1]] = playerNumber;
     }
 
