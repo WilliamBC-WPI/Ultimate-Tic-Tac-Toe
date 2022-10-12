@@ -322,7 +322,7 @@ public class Minimax {
                     if (board[i][j] == 0) {
                         board[i][j] = 1;
                         if (checkWinCondition(board[i]) == 0) {
-                            double moveValue = minimax(2, boardToPlayOn, true, board, MIN_VALUE, MAX_VALUE);
+                            double moveValue = minimax(6, boardToPlayOn, true, board, MIN_VALUE, MAX_VALUE);
 
                             System.out.println("move value is " + moveValue);
 
@@ -340,7 +340,7 @@ public class Minimax {
                 if (board[boardToPlayOn][i] == 0) {
                     board[boardToPlayOn][i] = 1;
 
-                    double moveValue = minimax(2, boardToPlayOn, true, board, MIN_VALUE, MAX_VALUE);
+                    double moveValue = minimax(6, boardToPlayOn, true, board, MIN_VALUE, MAX_VALUE);
 
                     System.out.println("move value is " + moveValue);
 
